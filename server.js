@@ -28,7 +28,7 @@ app.get('/api/scrape', async (req, res) => {
 
   try {
     const serpApiKey = process.env.SERPAPI_KEY;  // استبدله بمفتاحك من SerpAPI
-
+const CHROME_PATH = path.join(__dirname, "chromium", "chrome-linux", "chrome");
     const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&api_key=${serpApiKey}`;
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
@@ -36,7 +36,7 @@ app.get('/api/scrape', async (req, res) => {
     const browser = await puppeteer.launch({ 
          headless: true, // or "new" for the latest headless mode
           args: ["--no-sandbox", "--disable-setuid-sandbox"] , 
-          executablePath: puppeteer.executablePath().toString() //|| '/usr/bin/chromium-browser' // Adjust path if necessary
+          executablePath: CHROME_PATH //|| '/usr/bin/chromium-browser' // Adjust path if necessary
 
     });
     const page = await browser.newPage();
