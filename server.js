@@ -33,9 +33,10 @@ app.get('/api/scrape', async (req, res) => {
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
-    const browser = await puppeteer.launch({ headless: true  , 
-       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-       executablePath: puppeteer.executablePath() // Adjust this path if necessary
+    const browser = await puppeteer.launch({ 
+         headless: "new",
+          args: ["--no-sandbox", "--disable-setuid-sandbox"]
+
     });
     const page = await browser.newPage();
 
