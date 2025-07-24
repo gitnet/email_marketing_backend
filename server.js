@@ -34,7 +34,7 @@ app.get('/api/scrape', async (req, res) => {
     const organicResults = response.data.organic_results || [];
 
     const browser = await puppeteer.launch({ 
-         headless: "new",
+         headless: true, // or "new" for the latest headless mode
           args: ["--no-sandbox", "--disable-setuid-sandbox"]
 
     });
