@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
+const puppeteer = require("puppeteer-core");
 const bodyParser = require('body-parser');
 
 const app = express();
