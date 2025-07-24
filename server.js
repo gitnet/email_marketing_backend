@@ -36,7 +36,7 @@ app.get('/api/scrape', async (req, res) => {
     const browser = await puppeteer.launch({ 
          headless: true, // or "new" for the latest headless mode
           args: ["--no-sandbox", "--disable-setuid-sandbox"] , 
-          executablePath: puppeteer.executablePath() //|| '/usr/bin/chromium-browser' // Adjust path if necessary
+          executablePath: puppeteer.executablePath().toString() //|| '/usr/bin/chromium-browser' // Adjust path if necessary
 
     });
     const page = await browser.newPage();
