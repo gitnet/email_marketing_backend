@@ -34,12 +34,7 @@ app.get('/api/scrape', async (req, res) => {
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
-    const browser = await puppeteer.launch({ 
-         headless: true, // or "new" for the latest headless mode
-          args: ["--no-sandbox", "--disable-setuid-sandbox"] , 
-          executablePath: CHROME_PATH //|| '/usr/bin/chromium-browser' // Adjust path if necessary
-
-    });
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     const results = [];
