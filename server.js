@@ -4,7 +4,6 @@ const axios = require('axios');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
-const path = require('path');
 
 const app = express();
 const PORT = 5055;
