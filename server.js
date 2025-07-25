@@ -32,6 +32,8 @@ app.get('/api/scrape', async (req, res) => {
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
+    console.log(`The executable path for Puppeteer is: `);
+    console.log(puppeteer.executablePath());
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
