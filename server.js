@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const puppeteer = require("puppeteer-core");
+const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
 const path = require('path');
 
@@ -29,15 +29,18 @@ app.get('/api/scrape', async (req, res) => {
 
   try {
     const serpApiKey = process.env.SERPAPI_KEY;  // استبدله بمفتاحك من SerpAPI
-    const CHROME_PATH = path.join(__dirname, "chromium", "chrome-linux", "chrome");
-    const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&api_key=${serpApiKey}`;
+   const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&api_key=${serpApiKey}`;
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
 
+    const page = await browser.newPage();
     const results = [];
+
 
     for (let result of organicResults.slice(0, 5)) {
       const url = result.link;
