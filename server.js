@@ -4,6 +4,7 @@ const axios = require('axios');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
+const { chromium } = require('playwright');
 
 const app = express();
 const PORT = 5055;
@@ -33,13 +34,18 @@ app.get('/api/scrape', async (req, res) => {
     const organicResults = response.data.organic_results || [];
 
  
-    const browser = await puppeteer.launch({
-      executablePath: puppeteer.executablePath() , //"/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome",
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    // const browser = await puppeteer.launch({
+    //   executablePath: puppeteer.executablePath() , //"/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome",
+    //   headless: true,
+    //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // });
 
+    // const page = await browser.newPage();
+    const browser = await chromium.launch({
+        headless: true,
+      });
     const page = await browser.newPage();
+
     const results = [];
 
 
