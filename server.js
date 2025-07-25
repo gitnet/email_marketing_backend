@@ -4,6 +4,7 @@ const axios = require('axios');
 const cors = require('cors');
 const puppeteer = require("puppeteer-core");
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const PORT = 5055;
@@ -28,7 +29,7 @@ app.get('/api/scrape', async (req, res) => {
 
   try {
     const serpApiKey = process.env.SERPAPI_KEY;  // استبدله بمفتاحك من SerpAPI
-const CHROME_PATH = path.join(__dirname, "chromium", "chrome-linux", "chrome");
+    const CHROME_PATH = path.join(__dirname, "chromium", "chrome-linux", "chrome");
     const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&api_key=${serpApiKey}`;
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
