@@ -35,6 +35,7 @@ app.get('/api/scrape', async (req, res) => {
     console.log(`The executable path for Puppeteer is: `);
     console.log(puppeteer.executablePath());
     const browser = await puppeteer.launch({
+      executablePath: "/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome",
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
