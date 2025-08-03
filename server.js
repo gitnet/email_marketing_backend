@@ -29,12 +29,13 @@ const extractEmailsFromHtml = (html) => {
 };
 
 app.get('/api/scrape', async (req, res) => {
-  const { q } = req.query;
+  const { q , num} = req.query;
+
   if (!q) return res.status(400).json({ error: 'Missing query' });
 
   try {
     const serpApiKey = process.env.SERPAPI_KEY;
-    const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&num=100&api_key=${serpApiKey}`;
+    const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&num=${num}&api_key=${serpApiKey}`;
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
