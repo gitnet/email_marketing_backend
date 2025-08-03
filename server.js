@@ -2,15 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
-const { chromium } = require('playwright');
+const compression = require('compression');
+
 
 const app = express();
-const PORT = 5055;
+const PORT = process.env.PORT || 8080;
+
+// Puppeteer setup (auto-detect local vs AWS Lambda)
+const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+const puppeteer = isLambda ? require('puppeteer-core') : require('puppeteer');
+const chromium = isLambda ? require('chrome-aws-lambda') : null;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(compression());
 
 const extractEmailsFromHtml = (html) => {
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
@@ -24,30 +30,44 @@ const extractEmailsFromHtml = (html) => {
 
 app.get('/api/scrape', async (req, res) => {
   const { q } = req.query;
-
   if (!q) return res.status(400).json({ error: 'Missing query' });
 
   try {
-    const serpApiKey = process.env.SERPAPI_KEY;  // استبدله بمفتاحك من SerpAPI
-   const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&api_key=${serpApiKey}`;
+    const serpApiKey = process.env.SERPAPI_KEY;
+    const searchUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&num=100&api_key=${serpApiKey}`;
     const response = await axios.get(searchUrl);
     const organicResults = response.data.organic_results || [];
 
- 
-    // const browser = await puppeteer.launch({
-    //   executablePath: puppeteer.executablePath() , //"/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome",
-    //   headless: true,
-    //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    // });
+    // Launch Puppeteer
+    const browser = await puppeteer.launch(
+      isLambda
+        ? {
+            args: chromium.args,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+          }
+        : {
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          }
+    );
 
-    // const page = await browser.newPage();
-    const browser = await chromium.launch({
-        headless: true,
-      });
     const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 720 });
+    
+    await page.setRequestInterception(true);
+      page.on('request', (req) => {
+        const resourceType = req.resourceType();
+        if (['image', 'media', 'stylesheet', 'font'].includes(resourceType)) {
+          req.abort();
+        } else {
+          req.continue();
+        }
+      });
+
+
 
     const results = [];
-
 
     for (let result of organicResults.slice(0, 5)) {
       const url = result.link;
@@ -70,7 +90,7 @@ app.get('/api/scrape', async (req, res) => {
       query: q,
       totalFound: uniqueEmails.length,
       emails: uniqueEmails,
-      contents: results
+      contents: results,
     });
   } catch (error) {
     console.error(error);
